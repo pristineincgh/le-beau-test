@@ -21,5 +21,6 @@ export const auth = betterAuth({
       },
     },
   },
+  trustedOrigins: ['http://localhost:3000', 'https://le-beau-test.vercel.app'],
   plugins: [nextCookies()],
 });
