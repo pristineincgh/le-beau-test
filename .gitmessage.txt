@@ -1,0 +1,18 @@
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+
+# Examples:
+# feat(auth): add login form
+# fix(api): correct null pointer error
+# docs(readme): update setup instructions
+# style: apply Prettier formatting
+# refactor(user-service): simplify createUser method
+# perf(db): optimize query execution
+# test(auth): add unit tests for login functionality
+# chore(deps): update eslint to v9
+#
+# Body: explain *why* the change was made, not just what.
+# Footer: reference issues or BREAKING CHANGE notes.

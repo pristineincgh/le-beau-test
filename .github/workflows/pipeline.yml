@@ -1,0 +1,85 @@
+name: Le Beau Prototype FE Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  # 1. Lint and Build across multiple Node versions
+  lint-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22, 24]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      # ✅ Check Node version
+      - name: Check Node version
+        run: |
+          REQUIRED="22"
+          CURRENT=$(node -v | sed 's/v//')
+          if [ "$(printf '%s\n' "$REQUIRED" "$CURRENT" | sort -V | head -n1)" != "$REQUIRED" ]; then
+            echo "Node version $CURRENT is too old. Requires >= $REQUIRED."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier check
+        run: npm run prettier:check
+
+      - name: Build project
+        run: npm run build
+
+  # 2. Deploy to Dev (only if lint/build passes)
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Deploy to Vercel (Dev)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DEV }}
+          working-directory: ./
+          vercel-args: '--prod'
+
+  # 3. Deploy to Main (only if lint/build passes)
+  deploy-main:
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Deploy to Vercel (Main)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_PROD }}
+          working-directory: ./
+          vercel-args: '--prod'
