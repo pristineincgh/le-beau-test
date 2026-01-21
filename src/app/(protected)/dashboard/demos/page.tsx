@@ -1,14 +1,14 @@
-import LoginForm from '@/components/sections/auth/login/LoginForm';
-import { requireNoAuth } from '@/lib/auth-utils';
+import DemoAccounts from "@/components/dashboard/DemoAccounts";
+import { requireAuth } from "@/lib/auth-utils";
 
-const LoginPage = async () => {
-  await requireNoAuth();
-
+const DemosPage = async () => {
+  await requireAuth()
+  
   return (
     <div className="grid lg:grid-cols-2 gap-12 items-center">
-      {/* Left Column - Login Form */}
+      {/* Left Column - Demo Accounts */}
       <div className="max-w-md mx-auto lg:mx-0 w-full">
-        <LoginForm />
+        <DemoAccounts />
       </div>
 
       {/* Right Column - Hero Text */}
@@ -29,5 +29,5 @@ const LoginPage = async () => {
       </div>
     </div>
   );
-};
-export default LoginPage;
+}
+export default DemosPage
